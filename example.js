@@ -1,40 +1,68 @@
+function TodoList({todos}){
+  // const items = [];
+  // for(let todo of todos){
+  //   items.push(<li key={todo.id}>{todo.text}</li>)
+  // }
+  // return(
+  //   <ul>
+  //   {items}
+  //   </ul>
+  // )
+  return(
+    <ul>
+    {todos.map(todo =>
+      <li key={todo.id}>
+      {todo.isCompleted
+        ? <del>{todo.text}</del>
+        : todo.text
+      }
+      </li>)}
+    </ul>
+  )
+}
+
 class AppComponent extends React.Component {
   constructor(props){
     super(props);
-    // the only place where you do state changes is in the constructor
-    this.state = {count: 5, title: "hello world"};
-    // locks them in to AppComponent
-    this.increment = this.increment.bind(this);
-    this.decrement = this.decrement.bind(this);
+    this._nextTodoId = 1;
+    this.state = {
+      filter: {showCompleted: true},
+      todos: [
+        {id: this._nextTodoId++, text:"hey", isCompleted:false},
+        {id: this._nextTodoId++, text:"Blah", isCompleted:true},
+        {id: this._nextTodoId++, text:"Stuff", isCompleted:true},
+        {id: this._nextTodoId++, text:"Things", isCompleted:false}
+      ]
+    };
+    this._onShowCompletedChanged = this._onShowCompletedChanged.bind(this);
   }
-    render(){
-      const {count, title} = this.state;
-      return(
-        <section className="site-wrap">
-          <h1>Title: {title}!</h1>
-          <p>Counter: {count}! </p>
-          <div>
-            <button onClick={this.decrement}>- counter</button>
-            <button onClick={this.increment}>+ counter</button>
-          </div>
-        </section>
-      );
-      // return React.createElement(
-      //   "section",
-      //   {className: "site-wrap"},
-      //   React.createElement("h1",null,"Header"),
-      //   React.createElement("p",null,"lorem"));
-    }
-  increment(){
-    const {count} =  this.state;
-    this.setState({count: count + 1})
+  render(){
+    const {filter,  todos} = this.state;
+    const filteredTodos = filter.showCompleted
+    ? todos
+    : todos.filter(todo=> !todo.isCompleted)
+
+    return(
+      <div>
+        <h2>Todo list again....</h2>
+        <label>
+          Show Completed
+          <input type="checkbox"
+          checked={filter.showCompleted}
+          onChange={this._onShowCompletedChanged} />
+        </label>
+        <TodoList todos={filteredTodos} />
+      </div>
+    );
   }
-  decrement(){
-    const {count} =  this.state;
-    this.setState({count: count - 1})
+  _onShowCompletedChanged(e){
+    this.setState({
+      filter:{showCompleted: e.target.checked}
+    });
+
   }
 }
 
 ReactDOM.render(
-  <AppComponent />,
-  document.getElementById("application"));
+  <AppComponent />, document.getElementById("application")
+)
